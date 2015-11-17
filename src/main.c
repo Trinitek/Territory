@@ -13,8 +13,7 @@ int main(void) {
     char errstring[256];
     
     // Spawn rendering thread
-    render_instance renderInstance;
-    uintptr_t renderThread = _beginthread(render_main, 0, (void*) &renderInstance);
+    uintptr_t renderThread = _beginthread(render_main, 0, NULL);
     if (renderThread == -1L) {
         snprintf(errstring, 256, "Can't create render thread: %x", errno);
         MessageBox(NULL, errstring, CAPTION, 0x10);
