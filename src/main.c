@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <windows.h>
 #include <process.h>
-#include "SFML/Graphics.h"
+#include "sfml.h"
 #include "render.h"
+#include "event.h"
 
 #define CAPTION "Territory"
 
@@ -15,12 +16,20 @@ int main(void) {
     // Spawn rendering thread
     uintptr_t renderThread = _beginthread(render_main, 0, NULL);
     if (renderThread == -1L) {
-        snprintf(errstring, 256, "Can't create render thread: %x", errno);
+        snprintf(errstring, 256, "Cannot create render thread: 0x%x", errno);
         MessageBox(NULL, errstring, CAPTION, 0x10);
         return 1;
     }
     
-    while (1);
+    // Spawn event handling thread
+    uintptr_t eventThread = _beginthread(event_main, 0, NULL);
+    if (eventThread == -1L) {
+        snprintf(errstring, 256, "Cannot create event handler thread: 0x%x", errno);
+        MessageBox(NULL, errstring, CAPTION, 0x10);
+        return 1;
+    }
+    
+    while (1) Sleep(100);
     
     // Create window
     sfRenderWindow* window = sfRenderWindow_create((sfVideoMode){DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT, 32}, "Territory", sfResize | sfClose, NULL);

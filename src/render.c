@@ -2,14 +2,21 @@
 #define _RENDER_PROC_
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <windows.h>
-#include "SFML/Graphics.h"
+#include "sfml.h"
 #include "render.h"
+
+sfRenderWindow* window;
+sfView* mainView;
+sfEvent event;
+volatile bool closeFlag;
+volatile sfBool eventAvailable;
 
 void render_main(void) {
     
     // Create the main window and the main view
-    sfRenderWindow* window = sfRenderWindow_create(
+    window = sfRenderWindow_create(
         (sfVideoMode){
             DEFAULT_WIN_WIDTH,
             DEFAULT_WIN_HEIGHT,
@@ -20,7 +27,7 @@ void render_main(void) {
         NULL
         );
     if (!window) return;
-    sfView* mainView = sfView_createFromRect(
+    mainView = sfView_createFromRect(
         (sfFloatRect){
             0,
             0,
@@ -30,28 +37,23 @@ void render_main(void) {
     sfView_zoom(mainView, 0.25);
     sfRenderWindow_setView(window, mainView);
     
-    sfEvent event;
+    closeFlag = false;
+    eventAvailable = sfFalse;
     while (sfRenderWindow_isOpen(window)) {
-        while (sfRenderWindow_pollEvent(window, &event)) {
-            switch (event.type) {
-                case sfEvtClosed:
-                    sfRenderWindow_close(window);
-                    break;
-                case sfEvtResized:
-                    sfView_setSize(
-                        mainView,
-                        (sfVector2f){
-                            event.size.width,
-                            event.size.height
-                        }
-                    );
-                    sfView_zoom(mainView, 0.25);
-                    sfRenderWindow_setView(window, mainView);
-                    break;
-            }
+        eventAvailable = sfRenderWindow_pollEvent(window, &event);
+        if (closeFlag) {
+            closeFlag = false;
+            sfRenderWindow_close(window);
+            sfRenderWindow_destroy(window);
         }
         
         sfRenderWindow_clear(window, sfBlue);
         sfRenderWindow_display(window);
+        
+        Sleep(10);
     }
+}
+
+void closeMainWindow(void) {
+    closeFlag = true;
 }
