@@ -5,11 +5,11 @@
 #include <stdbool.h>
 #include <windows.h>
 #include "sfml.h"
+#include "map.h"
 #include "render.h"
 
 sfRenderWindow* window;
 sfView* mainView;
-sfView* infoView;
 
 void render_main(void) {
     
@@ -24,13 +24,8 @@ void render_main(void) {
     if (!window) return;
     
     mainView = sfView_createFromRect(
-        (sfFloatRect){0, 0, DEFAULT_WIN_WIDTH * 0.80, DEFAULT_WIN_HEIGHT});
-        
+        (sfFloatRect){0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT});
     sfView_zoom(mainView, 0.75);
-    
-    sfView_setViewport(mainView, (sfFloatRect){0, 0, 0.80, 1});
-        
-    sfRenderWindow_setView(window, mainView);
     
     /*** ***/
     
@@ -43,24 +38,20 @@ void render_main(void) {
     
     const int mapWidth = 40;
     const int mapHeight = 20;
-    int map[mapWidth][mapHeight];
     sfImage* mapImage = sfImage_create(mapWidth * 16, mapHeight * 16);
     
-    int r;
+    worldmap* map = newMap(mapWidth, mapHeight);
+    
     for (int y = 0; y < mapHeight; y++) {
         for (int x = 0; x < mapWidth; x++) {
-            r = rand() % 2;
-            map[x][y] = r;
-            printf("%d", r);
             sfImage_copyImage(
                 mapImage,
-                r ? grassImage : oceanImage,
+                map->tiles[x][y] ? grassImage : oceanImage,
                 x * 16,
                 y * 16,
                 (sfIntRect){0, 0, 16, 16},
                 sfTrue);
         }
-        printf("\n");
     }
     
     sfSprite* mapSprite = sfSprite_create();
@@ -95,14 +86,16 @@ void render_main(void) {
             }
             sfView_setSize(
                 mainView,
-                (sfVector2f){render_event.size.width * 0.80, render_event.size.height}
+                (sfVector2f){render_event.size.width, render_event.size.height}
                 );
             sfView_zoom(mainView, 0.75);
-            sfRenderWindow_setView(window, mainView);
         }
         
         sfRenderWindow_clear(window, sfBlue);
+        
+        sfRenderWindow_setView(window, mainView);
         sfRenderWindow_drawSprite(window, mapSprite, NULL);
+        
         sfRenderWindow_display(window);
         
         Sleep(10);

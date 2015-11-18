@@ -1,7 +1,7 @@
 @mkdir out 2>NUL
 @cd src
 gcc ^
-main.c render.c event.c ^
+main.c render.c event.c map.c ^
 -o ../out/territory.exe ^
 -std=c11 ^
 -I . ^
