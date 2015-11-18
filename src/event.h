@@ -4,10 +4,12 @@
 
 #ifndef _EVENT_PROC_
 
-void event_main(void* arg);
+    void event_main(void* arg);
 
-#else
-#undef _EVENT_PROC_
+#endif
+
+#ifdef _EVENT_PROC_
+#undef _RENDER_PROC_
 #endif
 
 #endif

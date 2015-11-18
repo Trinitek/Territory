@@ -8,15 +8,15 @@
 #include "render.h"
 #include "event.h"
 
-volatile sfEvent event;
-volatile sfBool eventAvailable;
-
 void event_main(void) {
     while (true) {
         if (eventAvailable) {
-            switch (event.type) {
+            switch (render_event.type) {
                 case sfEvtClosed:
-                    closeMainWindow();
+                    render_closeFlag = true;
+                    break;
+                case sfEvtResized:
+                    render_rescaleFlag = true;
                     break;
             }
         }
